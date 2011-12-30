@@ -1,0 +1,14 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    bzip2-ruby (0.2.7)
+    multi_json (1.0.4)
+    steam-condenser (1.1.0)
+      bzip2-ruby (~> 0.2.7)
+      multi_json (~> 1.0.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  steam-condenser
