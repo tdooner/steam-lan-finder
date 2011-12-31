@@ -10,7 +10,7 @@ post '/' do
     a.fetch_games
     str = haml :index 
     str << "<h1>What #{params[:steam_id]} owns:</h1>"
-    a.games.each do |k,e|
+    a.games.sort{|x,y| x.name <=> y.name}.each do |k,e|
         str << e.name + "<br />"
     end
 
