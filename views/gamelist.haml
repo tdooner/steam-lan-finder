@@ -1,0 +1,29 @@
+:javascript
+  var getDetails = function(steam_id) {
+    var base_url = "/ajax/" + steam_id;
+    $.ajax({
+      url: base_url,
+      dataType: 'json',
+      success: function(data) {
+        $("#" + steam_id).html(data["nickname"]).append("<img src='" + data["icon_url"] + "'>") ;
+      }
+    });
+  }
+
+  $(function() {
+    $("#friends li").each(function() {
+        getDetails(this.id);
+        //alert(this.innerHTML);
+    });
+  });
+%div{:style=>"width:50%; float:left;"}
+  %h1="Games:"
+  %ul
+    - @games.values.each do |e|
+      %li=e.name
+%div{:style=>"width:50%; float:left;"}
+  %h1="Friends:"
+  %ul#friends
+    - @friends.each do |f|
+      %li{:id=>f.steam_id64}
+        =f.steam_id64

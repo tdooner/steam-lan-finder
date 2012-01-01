@@ -1,0 +1,29 @@
+body,html {
+    margin:0;
+    padding:0;
+    background-color:#EFEFEF;
+}
+div.container {
+    width:900px;
+    margin:auto;
+}
+.center {
+    text-align:center;
+}
+span.big {
+    font-size:2em;
+    font-family: sans-serif;
+}
+h1 {
+    text-align:center;
+}
+form input.text {
+    width:200px;
+    line-height:2em;
+    font-size:2em;
+}
+form input.button {
+    height:35px;
+    position:relative;
+    bottom:8px;
+}
