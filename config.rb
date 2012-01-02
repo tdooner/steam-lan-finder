@@ -1,2 +1,4 @@
 # Configure this for your own environment:
-ENV["REDISTOGO_URL"] = 'redis://username:password@my.host:6789'
+if not ENV["REDISTOGO_URL"]
+    ENV["REDISTOGO_URL"] = 'redis://username:password@my.host:6789'
+end
