@@ -27,7 +27,7 @@ form input.button {
     position:relative;
     bottom:8px;
 }
-ul#friends li {
+ul#friends li, ul#users li {
     list-style:none;
     margin:10px;
     padding:5px;
@@ -35,9 +35,9 @@ ul#friends li {
     color:#8BC53F;
     font-weight:bold;
 }
-ul#friends li:hover {
+ul#friends li:hover, ul#users li:hover {
     background-color:#333;
 }
-ul#friends li img {
+ul#friends li img, ul#users li img {
     padding-right:15px;
 }

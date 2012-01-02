@@ -5,42 +5,50 @@
     getGames([steam_id]);
 
     var friends_url = "/ajax/info/" + steam_id;
+    loading("friends", true);
     $.ajax({
       url: friends_url,
       dataType: 'json',
       success: function(data) {
+        $("ul#users").append("<li><img src='"+data["icon_url"]+"'>" + data["nickname"] + "</li>");
         $.each(data["friends"], function(id, friend_info) {
           $("ul#friends").append("<li onclick='addID(\""+friend_info+"\");' id='" + friend_info + "'>Loading...</li>");
           getFriend(friend_info.toString());
         });
+
+        loading("friends", false);
       }
     });
   }
 
   var getFriend = function(steam_id) {
     var friends_url = "/ajax/info/" + steam_id;
+    loading("friends", true);
     $.ajax({
       url: friends_url,
       dataType: 'json',
       success: function(data) {
         $("li#" + steam_id).html(data["nickname"]).prepend("<img src='" + data["icon_url"] + "'>");
+
+        loading("friends", false);
       }
     });  
   }
 
   var addID = function(new_id) {
     ids.push(new_id);  
+    $("ul#users").append("<li>" + $("li#"+new_id)[0].innerHTML + "</li>");
     getGames(ids);
   }
 
   var getGames = function(users) {
+    $("ul#games").html("");
+    loading("games", true);
     $.ajax({
       type: 'POST',
       url: '/ajax/games/',
       data: { ids: JSON.stringify(users) },
       success: function(data) { 
-        $("ul#games").html("");
-
         // Combine the games together, and output on top the ones which are best
         game_users = {}
         $.each(data, function(steam_id, games) {
@@ -57,21 +65,38 @@
             $("ul#games").append("<li>" + game_name + "</li>");
           }
         });
+
+        loading("games", false);
       },
       dataType: 'json'
     });
   }
+  var loading = function(section, state) {
+    console.log($("div#"+section+"-loading"));
+    if (state) {
+      $("div#"+section+"-loading").show();
+    } else {
+      $("div#"+section+"-loading").hide();
+    }
+  }
 
   $(function() {
-    $("#friends li").each(function() {
-      load("#{@steam_id}");
-    });
+    loading("games", false);
+    loading("users", false);
+    loading("friends", false);
+    load("#{@steam_id}");
   });
 %div{:style=>"width:50%; float:left;"}
   %h1="Games:"
+  #games-loading
+    Loading...
   %ul#games
-    %li Loading...
 %div{:style=>"width:50%; float:left;"}
+  %h1="Users:"
+  #users-loading
+    Loading...
+  %ul#users
   %h1="Friends:"
+  #friends-loading
+    Loading...
   %ul#friends
-    %li Loading...
