@@ -1,29 +1,77 @@
 :javascript
-  var getDetails = function(steam_id) {
-    var base_url = "/ajax/" + steam_id;
+  var ids = ["#{@steam_id}"];
+
+  var load = function(steam_id) {
+    getGames([steam_id]);
+
+    var friends_url = "/ajax/info/" + steam_id;
     $.ajax({
-      url: base_url,
+      url: friends_url,
       dataType: 'json',
       success: function(data) {
-        $("#" + steam_id).html(data["nickname"]).append("<img src='" + data["icon_url"] + "'>") ;
+        $.each(data["friends"], function(id, friend_info) {
+          $("ul#friends").append("<li onclick='addID(\""+friend_info+"\");' id='" + friend_info + "'>Loading...</li>");
+          getFriend(friend_info.toString());
+        });
       }
+    });
+  }
+
+  var getFriend = function(steam_id) {
+    var friends_url = "/ajax/info/" + steam_id;
+    $.ajax({
+      url: friends_url,
+      dataType: 'json',
+      success: function(data) {
+        $("li#" + steam_id).html(data["nickname"]).prepend("<img src='" + data["icon_url"] + "'>");
+      }
+    });  
+  }
+
+  var addID = function(new_id) {
+    ids.push(new_id);  
+    getGames(ids);
+  }
+
+  var getGames = function(users) {
+    $.ajax({
+      type: 'POST',
+      url: '/ajax/games/',
+      data: { ids: JSON.stringify(users) },
+      success: function(data) { 
+        $("ul#games").html("");
+
+        // Combine the games together, and output on top the ones which are best
+        game_users = {}
+        $.each(data, function(steam_id, games) {
+          for (i in games) {
+            if (games[i] in game_users) {
+              game_users[games[i]].push(steam_id);
+            } else {
+              game_users[games[i]] = [steam_id];
+            }
+          }
+        });
+        $.each(game_users, function(game_name, owners) {
+          if (owners.length/ids.length >= 0.75) {
+            $("ul#games").append("<li>" + game_name + "</li>");
+          }
+        });
+      },
+      dataType: 'json'
     });
   }
 
   $(function() {
     $("#friends li").each(function() {
-        getDetails(this.id);
-        //alert(this.innerHTML);
+      load("#{@steam_id}");
     });
   });
 %div{:style=>"width:50%; float:left;"}
   %h1="Games:"
-  %ul
-    - @games.values.each do |e|
-      %li=e.name
+  %ul#games
+    %li Loading...
 %div{:style=>"width:50%; float:left;"}
   %h1="Friends:"
   %ul#friends
-    - @friends.each do |f|
-      %li{:id=>f.steam_id64}
-        =f.steam_id64
+    %li Loading...

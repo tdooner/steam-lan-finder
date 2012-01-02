@@ -12,18 +12,37 @@ get '/' do
 end
 
 post '/' do
-    a = SteamId.new(params[:steam_id])
-    a.fetch_games
-    a.fetch
-    @username = a.nickname
-    @games = a.games
-    @friends = a.friends
+    a = SteamId.new(params[:steam_id], true)
+    @steam_id = a.steam_id64
+    #a.fetch_games
+    #a.fetch
+    #@username = a.nickname
+    #@games = a.games
+    @username = "tdooner"
+    @games = []
+    @friends = []
 
     haml :gamelist
 end
 
-get '/ajax/:id' do |id|
+get '/ajax/info/:id' do |id|
     a = SteamId.new(id.to_i, true)
     
-    {:nickname=>a.nickname, :icon_url=>a.icon_url}.to_json
+    {:nickname=>a.nickname, :icon_url=>a.icon_url, :friends=>a.friends.map{|x| x.steam_id64.to_s}}.to_json
+end
+
+post '/ajax/games/' do
+    id_list = JSON.parse(params[:ids])
+    
+    g = {}
+    id_list.each do |steam_id|
+        begin
+            a = SteamId.new(steam_id.to_i)
+            a.fetch_games
+            g[steam_id] = a.games.map{|k,v| v.name}
+        rescue
+            g[steam_id] = []
+        end
+    end
+    g.to_json
 end
