@@ -34,8 +34,17 @@
 
   var addID = function(new_id) {
     ids.push(new_id);  
-    $("ul#users").append("<li>" + $("li#"+new_id)[0].innerHTML + "</li>");
+    $("ul#users").append("<li onclick='removeID(\""+new_id+"\");' id='"+new_id+"'>" + $("li#"+new_id)[0].innerHTML + "</li>");
     getGames(ids);
+  }
+
+  var removeID = function(rm_id) {
+    var pos = ids.indexOf(rm_id);
+    if (pos != -1) {
+      ids.splice(pos, 1);
+      $("ul#users li#" + rm_id).remove();
+      getGames(ids);
+    }
   }
 
   var getGames = function(users) {

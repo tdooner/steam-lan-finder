@@ -37,6 +37,7 @@ ul#friends li, ul#users li {
 }
 ul#friends li:hover, ul#users li:hover {
     background-color:#333;
+    cursor:pointer;
 }
 ul#friends li img, ul#users li img {
     padding-right:15px;
