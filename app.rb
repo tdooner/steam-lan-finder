@@ -3,10 +3,13 @@ require 'steam-condenser'
 require 'sinatra'
 require 'json'
 require 'config'
+require 'redis'
 
 configure do
     enable :sessions
     set :public_folder, File.dirname(File.expand_path(__FILE__)) + "/public"
+    uri = URI.parse(ENV["REDISTOGO_URL"])
+    REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 end
 
 get '/' do 
@@ -28,9 +31,14 @@ post '/' do
 end
 
 get '/ajax/info/:id' do |id|
+    cache = REDIS.get("info-#{id}")
+    return cache if cache
+
     a = SteamId.new(id.to_i, true)
-    
-    {:nickname=>a.nickname, :icon_url=>a.icon_url, :friends=>a.friends.map{|x| x.steam_id64.to_s}}.to_json
+    cache = {:nickname=>a.nickname, :icon_url=>a.icon_url, :friends=>a.friends.map{|x| x.steam_id64.to_s}}.to_json
+    # Cache the information for 5 minutes.
+    REDIS.setex("info-#{id}", 300, cache)
+    return cache
 end
 
 post '/ajax/games/' do
@@ -39,9 +47,16 @@ post '/ajax/games/' do
     g = {}
     id_list.each do |steam_id|
         begin
-            a = SteamId.new(steam_id.to_i)
-            a.fetch_games
-            g[steam_id] = a.games.map{|k,v| v.name}
+            cache = REDIS.get("games-#{steam_id}")
+            if cache
+                g[steam_id] = JSON.parse(cache)
+            else
+                a = SteamId.new(steam_id.to_i)
+                a.fetch_games
+                cache = a.games.map{|k,v| v.name}
+                g[steam_id] = cache
+                REDIS.setex("games-#{steam_id}", 300, cache.to_json)
+            end
         rescue
             g[steam_id] = []
         end

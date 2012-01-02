@@ -23,14 +23,11 @@
 
   var getFriend = function(steam_id) {
     var friends_url = "/ajax/info/" + steam_id;
-    loading("friends", true);
     $.ajax({
       url: friends_url,
       dataType: 'json',
       success: function(data) {
         $("li#" + steam_id).html(data["nickname"]).prepend("<img src='" + data["icon_url"] + "'>");
-
-        loading("friends", false);
       }
     });  
   }
@@ -72,7 +69,6 @@
     });
   }
   var loading = function(section, state) {
-    console.log($("div#"+section+"-loading"));
     if (state) {
       $("div#"+section+"-loading").show();
     } else {
