@@ -1,12 +1,12 @@
+$:.unshift File.expand_path(".")   # $: is ruby's $LOAD_PATH
 require 'steam-condenser' 
 require 'sinatra'
 require 'json'
+require 'config'
 
 configure do
     enable :sessions
     set :public_folder, File.dirname(File.expand_path(__FILE__)) + "/public"
-    # Configure this for your own environment:
-    ENV["REDISTOGO_URL"] = 'redis://username:password@my.host:6789'
 end
 
 get '/' do 
